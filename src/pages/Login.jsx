@@ -107,7 +107,7 @@ const Login = () => {
                 }
                 <button 
                     type="button"
-                    onClick={() => window.location.href = 'http://localhost:5173/'}
+                    onClick={() => window.location.href = 'https://docspot-com.vercel.app/'}
                     className='w-full py-2 rounded-md text-base border border-primary text-primary hover:bg-gray-50 mt-2'
                 >
                     Back to Home
