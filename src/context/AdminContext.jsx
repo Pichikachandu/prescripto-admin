@@ -98,45 +98,73 @@ const AdminContextProvider = ({ children }) => {
     }
 
     const cancelAppointment = async(appointmentId) => {
-        try{
+        try {
+            // Update local state optimistically
+            setAppointments(prevAppointments => 
+                prevAppointments.map(appt => 
+                    appt._id === appointmentId 
+                        ? { ...appt, cancelled: true, isCompleted: false }
+                        : appt
+                )
+            );
+            
             const {data} = await axios.post(`${backendUrl}/api/admin/appointment-cancel`, {appointmentId}, {
                 headers: {
                     'Authorization': `Bearer ${aToken}`,
                     'Content-Type': 'application/json'
                 },
-                timeout: 10000 // 10 second timeout
+                timeout: 10000
             });
             
             if (data.success) {
                 toast.success(data.message);
+                // Refresh data to ensure consistency
                 getAllAppointments();
             } else {
+                // Revert on error
                 toast.error(data.message || 'Failed to cancel appointment');
+                getAllAppointments();
             }
         } catch(error) {
+            // Revert on error
             toast.error(error.response?.data?.message || 'Failed to cancel appointment. Please try again.');
+            getAllAppointments();
         }
     }
 
     const completeAppointment = async(appointmentId) => {
-        try{
+        try {
+            // Update local state optimistically
+            setAppointments(prevAppointments => 
+                prevAppointments.map(appt => 
+                    appt._id === appointmentId 
+                        ? { ...appt, isCompleted: true, cancelled: false }
+                        : appt
+                )
+            );
+            
             const {data} = await axios.post(`${backendUrl}/api/admin/appointment-complete`, {appointmentId}, {
                 headers: {
                     'Authorization': `Bearer ${aToken}`,
                     'Content-Type': 'application/json'
                 },
-                timeout: 10000 // 10 second timeout
+                timeout: 10000
             });
             
             if (data.success) {
                 toast.success(data.message);
+                // Refresh data to ensure consistency
                 getAllAppointments();
             } else {
+                // Revert on error
                 toast.error(data.message || 'Failed to complete appointment');
+                getAllAppointments();
             }
         } catch(error) {
+            // Revert on error
             console.error('Error completing appointment:', error);
             toast.error(error.response?.data?.message || 'Failed to complete appointment. Please try again.');
+            getAllAppointments();
         }
     }
 
